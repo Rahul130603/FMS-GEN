@@ -27,3 +27,6 @@ data/*.corrupt-backup-*
 .DS_Store
 Thumbs.db
 
+
+# Downloaded report source checkout
+.report-source/

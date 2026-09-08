@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/original-reports/**/*.{js,jsx}"],
+  content: ["./src/original-reports/**/*.{js,jsx}", "./src/github-reports/**/*.{js,jsx,ts,tsx}"],
   important: ".original-report",
   corePlugins: { preflight: false },
   theme: {
