@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <semantics>
+    <mrow><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup></mrow>
+    <annotation encoding="application/x-speech-ssml">derivative of y with respect to x equals 3 x squared</annotation>
+  </semantics>
+</math>

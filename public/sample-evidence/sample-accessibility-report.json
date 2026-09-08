@@ -1,0 +1,18 @@
+{
+  "tool": "Ace by DAISY EPUB Accessibility Checker",
+  "version": "4.8.2",
+  "reportDate": "2026-09-04T09:18:00Z",
+  "summary": {
+    "issues": 1,
+    "critical": 1,
+    "passed": 42
+  },
+  "violations": [
+    {
+      "rule": "image-alt",
+      "impact": "critical",
+      "target": "figure.hero-fig > img",
+      "message": "Element does not have an alt attribute satisfying WCAG 1.1.1"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+PubVantage Production Studio — Production Evidence Log
+======================================================================
+Report ID: ERR-00125
+Source: QA Inspection
+Status: Open
+Environment: Production Server Node PRD-SCAN-1400
+Timestamp: 2026-09-04 09:18:22 UTC
+
+[INFO]  Initializing OCR Baseline Analyzer for 600 DPI Binary Scan
+[WARN]  Detected character distortion on ligature sequences (fi, fl, ffi)
+[ERROR] Glyph normalization failed at byte offset 0x4B20
+[INFO]  Recommendation: Recalibrate threshold parameter to 0.85
+======================================================================

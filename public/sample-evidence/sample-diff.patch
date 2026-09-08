@@ -1,0 +1,7 @@
+--- a/epdf/tag-trees/ch02_tables.xml
++++ b/epdf/tag-trees/ch02_tables.xml
+@@ -48,12 +48,16 @@
+-    <P>Serif Dimensions Table Header</P>
++    <Table id="tbl_02_01" summary="Classification of Transitional Serifs">
++      <TR><TH scope="col">Typeface Name</TH><TH scope="col">Contrast Ratio</TH></TR>
++    </Table>
