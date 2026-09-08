@@ -1,0 +1,405 @@
+/* Shared responsive safety net for every application module. */
+.main,.content,.panel,.scroll{min-width:0}
+.scroll{-webkit-overflow-scrolling:touch;max-width:100%}
+.scroll table{min-width:720px}
+img,svg,video,canvas{max-width:100%}
+input,select,textarea{max-width:100%}
+.content>*{max-width:100%;min-width:0}
+.content :where(section,article,div,form,fieldset){min-width:0}
+.content :has(>table){max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+:where(.emp-table-card,.emp-production-shell,.bulk-preview-table-wrap,.bulk-table-wrap,.bulk-matrix-table-wrap,.ed-table,.ed-table-wrap,.query-workspace,.allocation-table,.report-table,.report-table-wrapper,.notification-centre,.pi-table,.support-table,.mc-recent,.client-table-wrap,.pl-table-wrap,.fb-table-container,.qag-table-wrapper,.emp-scroll-x,.emp-reports-19col-wrap){max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+:where(.emp-modal-card,.bulk-modal,.support-modal,.pi-detail,.pi-form,.mc-compose-modal){max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto}
+:where(.head,.support-head,.ed-head,.pi>header,.emp-view-header,.bulk-page-header,.notification-page-head)>div{min-width:0}
+:where(.head, .support-head, .ed-head, .pi>header, .emp-view-header, .bulk-page-header, .notification-page-head) h1,
+:where(.head, .support-head, .ed-head, .pi>header, .emp-view-header, .bulk-page-header, .notification-page-head) p{overflow-wrap:anywhere}
+
+/* ==========================================================================
+   Left Sidebar Navigation (.side) - Smooth Scroll & Full Viewport Sizing
+   ========================================================================== */
+.side {
+  position: fixed !important;
+  inset: 0 auto 0 0 !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  background: #092644 !important;
+  color: #dce9e3;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  z-index: 100 !important;
+  transition: width .2s ease, transform .25s ease !important;
+}
+
+.side .brand {
+  flex-shrink: 0 !important;
+}
+
+.side .workspace {
+  flex-shrink: 0 !important;
+}
+
+/* Scrollable middle navigation container */
+.side nav {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 6px 10px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent !important;
+}
+
+.side nav::-webkit-scrollbar {
+  width: 5px;
+}
+.side nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.side nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+}
+.side nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.side nav button {
+  flex-shrink: 0 !important;
+  width: 100% !important;
+}
+
+/* Footer anchored at bottom of sidebar */
+.side footer {
+  flex-shrink: 0 !important;
+  margin-top: auto !important;
+  padding: 10px 10px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #092644 !important;
+  z-index: 2;
+}
+
+.side footer button {
+  width: 100% !important;
+}
+
+/* Desktop Collapsed Sidebar Mode (.side.closed) */
+@media (min-width: 801px) {
+  .side.closed {
+    width: 74px !important;
+  }
+  .side.closed .brand {
+    padding: 0 !important;
+    justify-content: center !important;
+  }
+  .side.closed .brand > div,
+  .side.closed .workspace,
+  .side.closed nav button span,
+  .side.closed footer button span {
+    display: none !important;
+  }
+  .side.closed nav {
+    padding: 6px 6px !important;
+  }
+  .side.closed nav button,
+  .side.closed footer button {
+    justify-content: center !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  .side.closed nav button svg,
+  .side.closed footer button svg {
+    margin: 0 !important;
+  }
+}
+
+/* Mobile Sidebar Backdrop */
+.side-backdrop {
+  display: none;
+}
+@media (max-width: 800px) {
+  .side-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 38, 68, 0.52);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 95;
+    animation: sideBackdropFade .2s ease;
+  }
+}
+@keyframes sideBackdropFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ==========================================================================
+   Laptop Height Adaptations (@media max-height)
+   Prevents any vertical cramping or cutting on 1366x768 & scaled displays
+   ========================================================================== */
+@media (max-height: 820px) {
+  .brand {
+    height: 64px !important;
+  }
+  .brand-logo-img {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .brand b {
+    font-size: 16.5px !important;
+  }
+  .workspace {
+    margin: 10px 10px 6px !important;
+    padding: 8px 10px !important;
+    min-height: auto !important;
+  }
+  .workspace small {
+    font-size: 9.5px !important;
+  }
+  .workspace b {
+    font-size: 12px !important;
+  }
+  .side nav {
+    padding: 4px 8px !important;
+    gap: 3px !important;
+  }
+  .side nav button {
+    height: 39px !important;
+    font-size: 13px !important;
+    padding: 0 11px !important;
+    gap: 10px !important;
+  }
+  .side nav button svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+  .side footer {
+    padding: 8px 10px !important;
+  }
+  .side footer button {
+    height: 38px !important;
+    font-size: 13px !important;
+  }
+}
+
+@media (max-height: 700px) {
+  .brand {
+    height: 56px !important;
+    padding: 0 12px !important;
+  }
+  .brand-logo-img {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .brand b {
+    font-size: 15px !important;
+  }
+  .brand span {
+    font-size: 10px !important;
+  }
+  .workspace {
+    margin: 5px 8px 4px !important;
+    padding: 6px 8px !important;
+  }
+  .workspace small {
+    font-size: 9px !important;
+  }
+  .workspace b {
+    font-size: 11.5px !important;
+  }
+  .side nav {
+    padding: 3px 6px !important;
+    gap: 2.5px !important;
+  }
+  .side nav button {
+    height: 35px !important;
+    font-size: 12px !important;
+    padding: 0 9px !important;
+    gap: 8px !important;
+  }
+  .side nav button svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .side footer {
+    padding: 6px 8px !important;
+  }
+  .side footer button {
+    height: 34px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-height: 560px) {
+  .brand {
+    height: 48px !important;
+  }
+  .brand-logo-img {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .brand b {
+    font-size: 13.5px !important;
+  }
+  .brand span {
+    display: none !important;
+  }
+  .workspace {
+    display: none !important;
+  }
+  .side nav button {
+    height: 32px !important;
+    font-size: 11.5px !important;
+  }
+}
+
+/* The left navigation consumes 256px, so complex desktop grids must collapse
+   before their inner columns become narrower than their controls. */
+@media(max-width:1500px){
+  .bulk-main-layout{grid-template-columns:1fr!important}
+  .bulk-selection-panel,.bulk-config-panel,.bulk-summary-panel{min-width:0!important}
+  .imail-layout.has-detail{grid-template-columns:175px minmax(0,1fr)!important}
+  .imail-detail{grid-column:1/-1}
+}
+
+@media(max-width:1300px){
+  .emp-overview-grid{grid-template-columns:minmax(230px,280px) minmax(0,1fr)!important}
+  .emp-col-right{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .production-bottom-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .production-bottom-grid>*:last-child{grid-column:1/-1}
+  .pl-kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+
+/* Medium Laptops (1366x768 & 1080p scaled displays <= 1200px) */
+@media(max-width:1200px){
+  .production-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .today-task-form{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .task-description-field{grid-column:1/-1!important}
+  .today-task-form .primary{grid-column:1/-1!important;width:100%!important}
+}
+
+@media(max-width:1100px){
+  .content{padding:22px 20px 42px}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .filters,.project-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .employee-focus,.profile-grid,.reports,.dash{grid-template-columns:1fr}
+  .emp-overview-grid{grid-template-columns:1fr!important}
+  .emp-col-right{grid-column:auto;grid-template-columns:1fr}
+  .support-category-cards{grid-template-columns:1fr}
+  .support-summary,.report-kpis,.notification-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .production-main-grid,.production-bottom-grid,.requirement-layout{grid-template-columns:1fr}
+  .production-bottom-grid>*:last-child{grid-column:auto}
+  .ed-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .emp-metrics-four-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .imail-layout,.imail-layout.has-detail{grid-template-columns:1fr!important}
+  .imail-folders,.imail-center,.imail-detail{grid-column:auto;min-width:0}
+  .imail-filterbar{grid-template-columns:minmax(180px,1fr) repeat(3,minmax(90px,120px))}
+}
+
+/* Small Laptops & Landscape Tablets (<= 1024px) */
+@media(max-width:1024px){
+  .hamb{
+    display:grid!important;
+    place-items:center;
+    width:38px;
+    height:38px;
+    border-radius:8px;
+    background:#f8fbfe;
+    color:#0b3c6d;
+    border:1px solid var(--line);
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .main>header{padding:0 18px}
+  .content{padding:20px 16px 40px}
+}
+
+@media(max-width:800px){
+  body{overflow-x:hidden}
+  .side{width:min(290px,86vw);box-shadow:12px 0 30px rgba(9,38,68,.24)}
+  .side.closed{width:min(290px,86vw);transform:translateX(-105%)}
+  .closed+.main,.main{margin-left:0;width:100%}
+  .main>header{height:64px;gap:10px}
+  .hamb{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:8px;color:#0b3c6d}
+  .global{width:auto;min-width:0;flex:1;height:40px}
+  .content{padding:18px 14px 36px;width:100%;overflow:hidden}
+  .head,.detail,.employee-table-head,.project-form-header{gap:12px;align-items:flex-start;flex-wrap:wrap}
+  .head h1{font-size:24px}
+  .head>div{min-width:0}
+  .tabs{overflow-x:auto;white-space:nowrap}
+  .tools{width:100%}
+  .tools>div{min-width:0;flex:1 1 100%}
+  .tools select{flex:1 1 160px;min-width:0}
+  .drop,.reportbuttons,.project-form-actions,.current-actions{flex-wrap:wrap}
+  .stages>div:not(.title){grid-template-columns:34px minmax(150px,1fr) 120px;overflow-x:auto}
+  .stages>div:not(.title)>:last-child{grid-column:2}
+  .support-summary,.report-kpis,.notification-stats,.ed-kpis,.emp-metrics-four-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .support-filters,.notification-centre-filters,.pi-summary,.bulk-toolbar,.bulk-header-actions{flex-wrap:wrap}
+  .support-filters>*{flex:1 1 180px}
+  .support-form-grid,.support-detail-grid,.pi-detail dl,.pi-form>div,.emp-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .project-context,.project-wide-detail,.allocation-selector,.member-grid{grid-template-columns:1fr!important}
+  .selector-arrow,.member-arrow{display:none!important}
+  .project-info-top,.project-mark,.project-health{min-width:0}
+  .project-mark em{white-space:normal}
+  .emp-dash-hero-card,.emp-alloc-hero-bar{align-items:flex-start;flex-wrap:wrap}
+  .emp-alloc-toolbar{grid-template-columns:1fr 1fr!important}
+  .emp-alloc-toolbar>*:first-child{grid-column:1/-1}
+  .emp-work-info-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .notification-panel{max-width:calc(100vw - 20px)}
+  .content :where(h1,h2,h3,h4,p,b,strong,span,small,dd){overflow-wrap:anywhere}
+  .content table{width:max-content;min-width:660px;max-width:none}
+}
+
+@media(max-width:560px){
+  .main>header{padding:0 10px}
+  .global{background:transparent;border:0;padding:0}
+  .global input{width:100%;font-size:12px}
+  .top .avatar{width:34px;height:34px}
+  .content{padding:14px 10px 30px}
+  .cards,.taskcards,.results,.facts,.filters,.project-form-grid,.clients,.settings{grid-template-columns:1fr}
+  .cards article>i{display:grid}
+  .head{margin-bottom:16px}
+  .head .primary,.head .secondary,.head .date{width:100%;justify-content:center}
+  .panel{border-radius:10px}
+  .scroll table{min-width:660px}
+  .project-form-actions>*{flex:1}
+  .toast{left:10px;right:10px;bottom:10px;justify-content:center}
+  .login>form{width:calc(100% - 32px)}
+  .placeholder{padding:32px 16px}
+  .support-summary,.report-kpis,.notification-stats,.ed-kpis,.emp-metrics-four-grid{grid-template-columns:1fr!important}
+  .support-form-grid,.support-detail-grid,.pi-detail dl,.pi-form>div,.emp-form-grid,.requirement-fields{grid-template-columns:1fr}
+  .support-form-grid .wide,.support-detail-grid>div.wide,.pi-detail .wide,.pi-form .wide{grid-column:auto}
+  .emp-kpi-cards-grid{grid-template-columns:1fr!important}
+  .emp-dash-hero-card{padding:17px}
+  .emp-dash-date-badge{width:100%;justify-content:center}
+  .emp-alloc-toolbar{grid-template-columns:1fr!important}
+  .emp-alloc-toolbar>*:first-child{grid-column:auto}
+  .emp-work-info-strip,.emp-two-hour-grid{grid-template-columns:1fr!important}
+  .emp-work-status-radios,.emp-transfer-actions,.emp-two-hour-actions{flex-wrap:wrap}
+  .emp-work-status-radios>*{flex:1 1 45%}
+  .emp-hero-profile-card{align-items:flex-start;flex-direction:column}
+  .emp-hero-meta-grid{grid-template-columns:1fr!important}
+  .emp-page-header{align-items:flex-start;flex-direction:column}
+  .emp-header-right-actions{width:100%}
+  .emp-header-right-actions>*{flex:1;justify-content:center}
+  .imail-kpis{grid-template-columns:1fr!important}
+  .imail-filterbar{grid-template-columns:1fr}
+  .notification-panel{left:8px;right:8px;width:auto}
+}
+
+@media(max-width:400px){
+  .top span{display:none!important}
+  .global kbd{display:none!important}
+  .head h1{font-size:20px!important}
+  .today-task-poster{padding:14px 12px!important}
+  .today-task-poster-header h3{font-size:16px!important}
+  .toast{font-size:11px;padding:9px 12px}
+}
+

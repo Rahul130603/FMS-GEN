@@ -1,0 +1,5 @@
+/* Keep the application UI from behaving like an editable document. */
+body,button,label,table,section,article,aside,header,footer,nav,div,span,p,h1,h2,h3,h4,h5,h6,small,b,strong,em,i,code,kbd,th,td{user-select:none;-webkit-user-select:none;caret-color:transparent}
+
+/* Genuine controls remain selectable and editable. */
+input,textarea,select,[contenteditable="true"]{user-select:text;-webkit-user-select:text;caret-color:auto}

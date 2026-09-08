@@ -1,0 +1,21 @@
+.files-workflow .head { margin-bottom: 24px; }
+.files-eyebrow { color: #2678bd; font-size: 12px; font-weight: 800; letter-spacing: 1px; }
+.files-workflow h1 { margin: 8px 0 6px; font-size: 26px; }
+.files-workflow .head p, .files-legend { color: #64748b; font-size: 13px; }
+.files-workflow table { min-width: 850px; width: 100%; }
+.files-workflow th small { display: block; text-transform: none; font-weight: 400; margin-top: 4px; }
+.files-workflow td code { white-space: nowrap; color: #1e3a8a; }
+.files-assignees { display: grid; gap: 7px; }
+.files-assignees > div { display: flex; align-items: baseline; gap: 10px; }
+.files-assignees span { min-width: 38px; font-size: 11px; color: #64748b; }
+.file-stage { display: inline-flex; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.file-stage-yta { background: #edf1f5; color: #596579; }
+.file-stage-start { background: #fff1d6; color: #925d08; }
+.file-stage-complete { background: #dcf6e9; color: #187346; }
+.file-stage-uploaded { background: #dceefe; color: #176aa7; }
+.files-workflow .files-empty { text-align: center; padding: 36px; color: #64748b; }
+
+.files-date-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin: 14px 0; }
+.files-date-filters label { display: grid; gap: 5px; font-size: 12px; color: #475569; }
+.files-date-filters input, .files-date-filters select, .files-date-filters button { min-height: 38px; padding: 8px 12px; border: 1px solid #d3e3f7; border-radius: 8px; background: white; color: #163955; }
+.files-date-filters small { flex-basis: 100%; color: #64748b; }

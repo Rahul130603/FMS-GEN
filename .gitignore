@@ -1,0 +1,29 @@
+node_modules/
+dist/
+private/
+data/employee-passwords.json
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+
+# Python cache & build
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database and runtime temp stores
+temp_file_store/
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+data/*.tmp
+data/*.bak
+data/*.corrupt-backup-*
+
+# OS files
+.DS_Store
+Thumbs.db
+

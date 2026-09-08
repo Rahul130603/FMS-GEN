@@ -1,0 +1,164 @@
+/* Unified FileFlow Pagination Stylesheet */
+.ff-pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: #ffffff;
+  border-top: 1px solid var(--line, #dce7f3);
+  font-size: 12.5px;
+  color: var(--muted, #64748b);
+  flex-wrap: wrap;
+}
+
+.ff-pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.ff-pagination-info b {
+  color: var(--ink, #0f172a);
+  font-weight: 700;
+}
+
+.ff-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ff-pagination-size-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.ff-pagination-size-select label {
+  font-size: 12px;
+  color: var(--muted, #64748b);
+}
+
+.ff-pagination-size-select select {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--line, #dce7f3);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink, #0f172a);
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.ff-pagination-size-select select:focus {
+  border-color: #2874b2;
+  box-shadow: 0 0 0 2px rgba(40, 116, 178, 0.15);
+}
+
+.ff-pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ff-page-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line, #dce7f3);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink, #0f172a);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.ff-page-btn:hover:not(:disabled) {
+  background: #eff6fc;
+  border-color: #8ec0e4;
+  color: #2874b2;
+}
+
+.ff-page-btn.active {
+  background: #2874b2;
+  border-color: #2874b2;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(40, 116, 178, 0.25);
+}
+
+.ff-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #f8fafc;
+  color: #94a3b8;
+  border-color: #e2e8f0;
+}
+
+.ff-page-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ff-page-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 32px;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.ff-pagination-status-mobile {
+  display: none;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  padding: 0 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ff-pagination-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+  .ff-pagination-info {
+    justify-content: center;
+  }
+  .ff-pagination-controls {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@media (max-width: 540px) {
+  .ff-page-btn.page-num {
+    display: none;
+  }
+  .ff-page-ellipsis {
+    display: none;
+  }
+  .ff-pagination-status-mobile {
+    display: inline-block;
+  }
+  .ff-page-btn.jump-btn {
+    display: none;
+  }
+}
+

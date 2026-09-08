@@ -1,0 +1,10 @@
+.client-projects .head { display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; }
+.client-projects .head label { display:grid; gap:6px; font-size:12px; }
+.client-projects .head select { padding:10px 14px; border:1px solid #cbdff4; border-radius:8px; background:white; max-width:100%; }
+.client-project-info { overflow:hidden; margin:20px 0; }
+.client-project-info header { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:24px; background:linear-gradient(110deg,#164674,#2d79b4); color:white; }
+.client-project-info h2 { margin:6px 0; }
+.client-project-info header p { margin:0; }
+.client-project-info dl { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:20px; padding:24px; margin:0; }
+.client-project-info dt { font-size:11px; text-transform:uppercase; color:#64748b; margin-bottom:6px; }
+.client-project-info dd { margin:0; overflow-wrap:anywhere; }

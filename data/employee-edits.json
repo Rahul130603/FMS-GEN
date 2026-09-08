@@ -1,0 +1,53 @@
+{
+  "upserts": {
+    "20013": {
+      "empId": "20013",
+      "giEmpId": "GEN0008",
+      "name": "Sivakumar G",
+      "address": "7/174, 2nd street, Athithananagar, Iyyappanthangal, chennai - 600056",
+      "permanentAddress": "7/174, 2nd street, Athithananagar, Iyyappanthangal, chennai - 600056",
+      "phone": "7358534315",
+      "personalEmail": "sivakumar30200@gmail.com",
+      "officeEmail": "gentizesiva2004@gmail.com",
+      "designation": "QAG",
+      "panCard": "",
+      "aadhaarNumber": "6394 6305 1705",
+      "emergencyContact": "9940420774",
+      "bloodGroup": "B+ve",
+      "dob": "30/Aug/2004",
+      "doj": "16-06-2025",
+      "qualification": "B.SC Computer Science",
+      "experience": "Fresher",
+      "gender": "Male",
+      "deviceNumber": "",
+      "mainDoorAccess": "Yes",
+      "leftDoorAccess": "No"
+    },
+    "20080": {
+      "empId": "20080",
+      "giEmpId": "GEN0063",
+      "name": "Sudhinraj A",
+      "address": "Plot:02, Padmavathi nagar,Near by SAN Academy, Velachery - 600042",
+      "permanentAddress": "3/13, Middle Street, Kidangudaiyampattu, Aarur Post, Sankarapuram Taluk, Kallakurichi District - 606402",
+      "phone": "8248148285",
+      "personalEmail": "sudhinns333@gmail.com",
+      "officeEmail": "gen.sudhinraj@gmail.com",
+      "designation": "DEVELOPER",
+      "panCard": "PJKPS0659P",
+      "aadhaarNumber": "2.18755E+11",
+      "emergencyContact": "6389498995",
+      "bloodGroup": "A+ve",
+      "dob": "07/Oct/2003",
+      "doj": "22-01-2026",
+      "qualification": "Bachelor of Computer Application",
+      "experience": "Fresher",
+      "gender": "Male",
+      "deviceNumber": "",
+      "mainDoorAccess": "Yes",
+      "leftDoorAccess": "No"
+    }
+  },
+  "deleted": [
+    "20012"
+  ]
+}

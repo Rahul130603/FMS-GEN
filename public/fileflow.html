@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FileFlow — Production File Handoff</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --teal-dark: #0b3c6d;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      font-size: 14px;
+    }
+    /* Layout */
+    .sidebar {
+      width: 260px;
+      background: #0d131f;
+      border-right: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .brand {
+      padding: 1.25rem 1.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .brand span.badge {
+      font-size: 0.65rem;
+      background: #1e293b;
+      color: #38bdf8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #334155;
+    }
+    .user-profile {
+      padding: 1rem 1.25rem;
+      background: #131d2e;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .user-profile label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .user-profile input {
+      width: 100%;
+      padding: 6px 10px;
+      background: #0b111c;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.85rem;
+      margin-bottom: 0.6rem;
+    }
+    .role-quick-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    .role-btn {
+      padding: 5px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+    .role-btn:hover { background: #334155; color: #fff; }
+    .role-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(2, 132, 199, 0.4);
+    }
+    .nav-links {
+      flex: 1;
+      padding: 1rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+    .nav-btn:hover { background: #1a2233; color: #f1f5f9; }
+    .nav-btn.active {
+      background: #0284c7;
+      color: #fff;
+      font-weight: 600;
+    }
+    .nav-btn .badge-count {
+      background: var(--danger);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      height: 100vh;
+    }
+    .topbar {
+      padding: 0.85rem 1.75rem;
+      background: #0d131f;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .role-badge {
+      background: rgba(2, 132, 199, 0.15);
+      color: #38bdf8;
+      border: 1px solid #0284c7;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    /* Work Timer Widget */
+    .timer-widget {
+      display: flex;
+      align-items: center;
+      background: #162032;
+      border: 1px solid #1f2d45;
+      padding: 4px 10px;
+      border-radius: 8px;
+      gap: 0.75rem;
+    }
+    .timer-display {
+      font-family: monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+    .timer-status {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .timer-status.working { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .timer-status.break { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    .timer-controls select, .timer-controls button {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid #334155;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .timer-controls button.stop { background: rgba(239, 68, 68, 0.2); color: #ef4444; border-color: #ef4444; }
+    /* Page Views */
+    .page-view {
+      display: none;
+      padding: 1.75rem;
+    }
+    .page-view.active { display: block; }
+    .page-header {
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-title { font-size: 1.5rem; font-weight: 700; color: #fff; }
+    .page-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+    /* Cards & Stats */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      position: relative;
+    }
+    .stat-card .num { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .stat-card .label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    /* Proceed Banner / Action */
+    .proceed-banner {
+      background: linear-gradient(135deg, #0b3c6d 0%, #0369a1 100%);
+      border: 1px solid #38bdf8;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(2, 132, 199, 0.25);
+    }
+    .proceed-title { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .proceed-subtitle { font-size: 0.85rem; color: #bae6fd; }
+    .btn-proceed {
+      background: #fff;
+      color: #0b3c6d;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .btn-proceed:hover {
+      background: #f0f9ff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    /* Tables */
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+    th {
+      background: #0b3c6d;
+      color: #e2e8f0;
+      font-weight: 600;
+      padding: 10px 12px;
+      border-bottom: 1px solid #1e293b;
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #1a2233;
+      color: #cbd5e1;
+      white-space: nowrap;
+    }
+    tr:hover td { background: #162032; }
+    /* Form controls & Buttons */
+    .btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: #1e293b; color: #cbd5e1; border-color: #334155; }
+    .btn-secondary:hover { background: #334155; color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-warning { background: var(--warning); color: #000; font-weight: 700; }
+    .btn-sm { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px; }
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      background: #0b111c;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+    textarea.form-control { font-family: monospace; font-size: 0.85rem; resize: vertical; }
+    /* Quota bar */
+    .quota-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .quota-bar-wrapper {
+      height: 10px;
+      background: #1f2937;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    .quota-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #0284c7);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      width: 550px;
+      max-width: 90vw;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .modal-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; }
+    .modal-footer { margin-top: 1.25rem; display: flex; justify-content: flex-end; gap: 8px; }
+    /* Status Pills */
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .pill-Allocated { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+    .pill-WIP { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+    .pill-Hold { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+    .pill-Complete { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid #6366f1; }
+    .pill-Rework, .pill-Reject { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span>FileFlow</span>
+      <span class="badge">v4.0</span>
+    </div>
+    <div class="user-profile">
+      <label>Employee ID</label>
+      <input type="text" id="employeeIdInput" value="EMP-1001" placeholder="Enter Employee ID" />
+      <label>Production Role</label>
+      <div class="role-quick-btn-grid">
+        <button class="role-btn active" data-role="book" onclick="selectRole('book')">Book Dev</button>
+        <button class="role-btn" data-role="cover" onclick="selectRole('cover')">Cover Dev</button>
+        <button class="role-btn" data-role="qc" onclick="selectRole('qc')">QC</button>
+        <button class="role-btn" data-role="qag" onclick="selectRole('qag')">QAG</button>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <button class="nav-btn active" onclick="goToPage('dashboard')">
+        <span>📊 Dashboard</span>
+      </button>
+      <button class="nav-btn" onclick="goToPage('network')">
+        <span>🌐 Network Copy</span>
+      </button>
+      <button class="nav-btn" onclick="goToPage('myfiles')">
+        <span>📁 My Files</span>
+      </button>
+      <button class="nav-btn" onclick="goToPage('tracker')">
+        <span>⏱️ Production Tracker</span>
+      </button>
+      <button class="nav-btn" onclick="goToPage('reports')">
+        <span>📋 Reports (19-Col)</span>
+      </button>
+      <button class="nav-btn" onclick="goToPage('notifications')">
+        <span>🔔 Notifications</span>
+        <span class="badge-count" id="notifBadge" style="display:none;">0</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="role-badge" id="topRoleBadge">Book Developer (book)</span>
+        <span style="font-size: 0.85rem; color: #94a3b8;" id="roleDeliverableDesc">Deliverable: &lt;isbn&gt;_txt.pdf</span>
+      </div>
+      <div class="topbar-right">
+        <!-- Work Timer Widget -->
+        <div class="timer-widget">
+          <div>
+            <div class="timer-display" id="topTimerDisplay">00:00:00</div>
+            <div class="timer-status working" id="topTimerStatus">WORKING</div>
+          </div>
+          <div class="timer-controls">
+            <select id="breakTypeSelect" onchange="handleBreakSelect(this.value)">
+              <option value="">Take Break...</option>
+              <option value="Tea Break">Tea Break (15m)</option>
+              <option value="Lunch Break">Lunch Break (45m)</option>
+              <option value="Meeting">Meeting</option>
+              <option value="Technical Issue">Technical Issue</option>
+              <option value="Personal">Personal</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" id="btnResumeTimer" onclick="resumeWorkTimer()" style="display:none;">Resume</button>
+            <button class="stop btn-sm" onclick="stopWorkTimer()">Stop</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- VIEW 1: DASHBOARD -->
+    <section id="page-dashboard" class="page-view active">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Production Dashboard</h1>
+          <p class="page-desc">Overview of your allocated ISBN files, real-time timer status, and handoffs.</p>
+        </div>
+      </div>
+
+      <!-- PROCEED BANNER -->
+      <div class="proceed-banner">
+        <div>
+          <div class="proceed-title">Ready to begin copying files?</div>
+          <div class="proceed-subtitle">Click Proceed to transfer your pending allocated ISBNs into Network Copy staging.</div>
+        </div>
+        <button class="btn-proceed" onclick="proceedToNetwork()">Proceed to Network Copy &rarr;</button>
+      </div>
+
+      <!-- Metric Cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="num" id="statAllocated">0</div>
+          <div class="label">Allocated</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="statWIP" style="color: #34d399;">0</div>
+          <div class="label">In Progress (WIP)</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="statHold" style="color: #fbbf24;">0</div>
+          <div class="label">On Hold / Break</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="statComplete" style="color: #a5b4fc;">0</div>
+          <div class="label">Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="statReject" style="color: #f87171;">0</div>
+          <div class="label">Rework / Reject</div>
+        </div>
+      </div>
+
+      <!-- Recent Allocations Table -->
+      <div class="page-header" style="margin-top: 2rem;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: #fff;">My Current Allocations</h2>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ISBN</th>
+              <th>Work Type</th>
+              <th>Status</th>
+              <th>Downloaded?</th>
+              <th>Uploaded?</th>
+              <th>Elapsed</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="dashboardTableBody">
+            <tr><td colspan="7" style="text-align: center; color: #64748b;">No allocations found.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 2: NETWORK COPY -->
+    <section id="page-network" class="page-view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Network Copy</h1>
+          <p class="page-desc">Stage source files into the isolated temporary quarantine store.</p>
+        </div>
+      </div>
+
+      <!-- Quarantine Banner -->
+      <div style="background: rgba(2, 132, 199, 0.1); border: 1px solid #0284c7; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+        <div style="font-weight: 700; color: #38bdf8; margin-bottom: 4px;">🛡️ Network Copy Quarantine Active</div>
+        <div style="font-size: 0.8rem; color: #bae6fd;">
+          Files are staged in an isolated temp store. No files are copied to your local <code>C:\QC_Testing</code> directory until you explicitly click "Download" in My Files.
+        </div>
+      </div>
+
+      <!-- Temp Quota Status -->
+      <div class="quota-container">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600;">
+          <span style="color: #94a3b8;">Temp Staging Quota (7.0 GB per owner)</span>
+          <span style="color: #38bdf8;" id="quotaLabel">0.0 MB / 7,000 MB</span>
+        </div>
+        <div class="quota-bar-wrapper">
+          <div class="quota-bar-fill" id="quotaFill"></div>
+        </div>
+        <div style="font-size: 0.72rem; color: #64748b;">Automatic 24-hour TTL expiration. Temporary files are safely cleaned after 1 day.</div>
+      </div>
+
+      <div style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+        <div class="form-group">
+          <label>Source Directory (Local or Network Share)</label>
+          <input type="text" id="netSourcePath" class="form-control" value="C:\QC_Testing\Source" placeholder="e.g. \\SERVER\Share\Production or C:\Source" />
+        </div>
+        <div class="form-group">
+          <label>ISBN List (Paste one per line, or comma/space separated)</label>
+          <textarea id="netIsbnList" class="form-control" rows="5" placeholder="9781234567890&#10;9780987654321"></textarea>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="startNetworkCopy()">Start ISBN Copy (Stage to Temp)</button>
+          <button class="btn btn-secondary" onclick="findOnlyIsbns()">Find Only</button>
+          <button class="btn btn-secondary" onclick="clearNetworkInputs()">Clear</button>
+          <button class="btn btn-secondary" onclick="prepareDummySource()">Generate Sample Source Files</button>
+        </div>
+      </div>
+
+      <div class="page-header">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: #fff;">Staged Temp Files</h2>
+        <button class="btn btn-danger btn-sm" onclick="deleteAllTempFiles()">Delete All Temp Files</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Original Name</th>
+              <th>Purpose / ISBN</th>
+              <th>Size</th>
+              <th>Created</th>
+              <th>Expires (TTL)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tempFilesTableBody">
+            <tr><td colspan="7" style="text-align: center; color: #64748b;">No staged temp files.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 3: MY FILES -->
+    <section id="page-myfiles" class="page-view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">My Files & Deliverables</h1>
+          <p class="page-desc">Download staged files on-demand and upload verified deliverable PDFs.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-primary btn-sm" onclick="downloadAllPending()">Download All</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteAllFilesPrompt()">Delete All</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ISBN</th>
+              <th>Work Type</th>
+              <th>Status</th>
+              <th>Book Dev Delivery</th>
+              <th>Cover Dev Delivery</th>
+              <th>QC Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="myFilesTableBody">
+            <tr><td colspan="7" style="text-align: center; color: #64748b;">Loading files...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 4: PRODUCTION TRACKER -->
+    <section id="page-tracker" class="page-view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Production Tracker</h1>
+          <p class="page-desc">Live tracking of active items with continuous work monitor.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary btn-sm" onclick="openRecentsModal()">View Recents Archive</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ISBN</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Start Time</th>
+              <th>Elapsed Timer</th>
+              <th>Break / Hold</th>
+              <th>Deliverable Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="trackerTableBody">
+            <tr><td colspan="8" style="text-align: center; color: #64748b;">No active tracked rows.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 5: REPORTS (19-COLUMN) -->
+    <section id="page-reports" class="page-view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Production Reports</h1>
+          <p class="page-desc">Complete 19-column report conforming to official publishing specs.</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-success" onclick="exportFullExcel()">Export Excel (.xlsx)</button>
+        </div>
+      </div>
+
+      <div class="table-container" style="max-height: 65vh; overflow: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Sl.No</th>
+              <th>Date</th>
+              <th>Emp ID</th>
+              <th>Emp Name</th>
+              <th>ISBN</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Total Time</th>
+              <th>Break Duration</th>
+              <th>Net Work Time</th>
+              <th>Deliverables</th>
+              <th>Uploaded Files</th>
+              <th>Remarks</th>
+              <th>QC Remarks</th>
+              <th>QAG Remarks</th>
+              <th>Saved Path</th>
+              <th>Completion Date</th>
+            </tr>
+          </thead>
+          <tbody id="reportsTableBody">
+            <tr><td colspan="19" style="text-align: center; color: #64748b;">No records for report.</td></tr>
+          </tbody>
+          <tfoot id="reportsTableFoot"></tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW 6: NOTIFICATIONS -->
+    <section id="page-notifications" class="page-view">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">System Notifications</h1>
+          <p class="page-desc">Automatic alerts for Rework, Reject, QC/QAG Readiness, and 2-Hour tracking.</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="markAllNotifsRead()">Mark All Read</button>
+      </div>
+
+      <div id="notifList" style="display: flex; flex-direction: column; gap: 8px;">
+        <!-- Notification cards -->
+      </div>
+    </section>
+  </main>
+
+  <!-- UPLOAD MODAL -->
+  <div class="modal-overlay" id="uploadModal">
+    <div class="modal-card">
+      <div class="modal-title" id="uploadModalTitle">Upload Deliverable</div>
+      <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 1rem;" id="uploadModalRule"></p>
+      <div class="form-group">
+        <label>Select PDF File</label>
+        <input type="file" id="uploadFileInput" class="form-control" accept=".pdf" />
+      </div>
+      <div id="uploadError" style="color: var(--danger); font-size: 0.8rem; margin-bottom: 0.5rem; display: none;"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('uploadModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitUploadDeliverable()">Upload File</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENTS MODAL -->
+  <div class="modal-overlay" id="recentsModal">
+    <div class="modal-card" style="width: 700px;">
+      <div class="modal-title">Recents Deleted Archive</div>
+      <div style="max-height: 50vh; overflow-y: auto;">
+        <div id="recentsList">Loading...</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('recentsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State Store & Config
+    const API_BASE = window.location.origin;
+    const AUTH_HEADER = { "X-FileFlow-Token": "fileflow-secret-token-2026", "Content-Type": "application/json" };
+
+    let currentRole = "book";
+    let employeeId = "EMP-1001";
+    let employeeName = "John Doe";
+    let activeAllocations = [];
+    let notifications = [];
+    let prefillNetworkIsbns = false;
+    let workTimerInterval = null;
+    let workTimerSeconds = 0;
+    let breakTimerSeconds = 0;
+    let isBreak = false;
+    let activeUploadIsbn = "";
+
+    // Deliverable rules per role
+    const ROLE_DELIVERABLES = {
+      book: { name: "Book Developer", label: "<isbn>_txt.pdf", allowed: (isbn, fn) => fn === `${isbn}_txt.pdf` },
+      cover: { name: "Cover Developer", label: "<isbn>_cvr_eu.pdf, <isbn>_cvr_int.pdf", allowed: (isbn, fn) => fn === `${isbn}_cvr_eu.pdf` || fn === `${isbn}_cvr_int.pdf` },
+      qc: { name: "Quality Control", label: "All 3 Deliverables", allowed: (isbn, fn) => [`${isbn}_txt.pdf`, `${isbn}_cvr_eu.pdf`, `${isbn}_cvr_int.pdf`].includes(fn) },
+      qag: { name: "QAG", label: "All 3 Deliverables", allowed: (isbn, fn) => [`${isbn}_txt.pdf`, `${isbn}_cvr_eu.pdf`, `${isbn}_cvr_int.pdf`].includes(fn) }
+    };
+
+    // Initialize
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedEid = localStorage.getItem("fileflow_eid");
+      if (savedEid) {
+        employeeId = savedEid;
+        document.getElementById("employeeIdInput").value = savedEid;
+      }
+      document.getElementById("employeeIdInput").addEventListener("change", (e) => {
+        employeeId = e.target.value.trim() || "EMP-1001";
+        localStorage.setItem("fileflow_eid", employeeId);
+        loadState();
+        refreshTempStatus();
+      });
+
+      // Start timers & polling
+      startWorkTimer();
+      loadState();
+      refreshTempStatus();
+      loadNotifications();
+      setInterval(loadNotifications, 10000); // 10s polling
+      setInterval(checkTwoHourTracking, 30000); // Check 2h tracking
+    });
+
+    function selectRole(role) {
+      currentRole = role;
+      document.querySelectorAll(".role-btn").forEach(b => {
+        b.classList.toggle("active", b.dataset.role === role);
+      });
+      const rule = ROLE_DELIVERABLES[role];
+      document.getElementById("topRoleBadge").innerText = `${rule.name} (${role})`;
+      document.getElementById("roleDeliverableDesc").innerText = `Deliverable: ${rule.label}`;
+      renderAllViews();
+    }
+
+    function goToPage(pageId) {
+      document.querySelectorAll(".page-view").forEach(p => p.classList.remove("active"));
+      document.getElementById(`page-${pageId}`).classList.add("active");
+      document.querySelectorAll(".nav-btn").forEach(b => {
+        b.classList.toggle("active", b.getAttribute("onclick")?.includes(pageId));
+      });
+
+      if (pageId === "network" && prefillNetworkIsbns) {
+        const isbns = activeAllocations.filter(a => a.status !== "Complete").map(a => a.isbn).join("\n");
+        document.getElementById("netIsbnList").value = isbns;
+        prefillNetworkIsbns = false;
+      }
+      if (pageId === "network") {
+        refreshTempStatus();
+        loadTempFiles();
+      }
+    }
+
+    function proceedToNetwork() {
+      prefillNetworkIsbns = true;
+      goToPage("network");
+    }
+
+    // Timer Implementation
+    function startWorkTimer() {
+      if (workTimerInterval) clearInterval(workTimerInterval);
+      workTimerInterval = setInterval(() => {
+        if (!isBreak) {
+          workTimerSeconds++;
+        } else {
+          breakTimerSeconds++;
+        }
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const sec = isBreak ? breakTimerSeconds : workTimerSeconds;
+      const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+      const s = String(sec % 60).padStart(2, "0");
+      document.getElementById("topTimerDisplay").innerText = `${h}:${m}:${s}`;
+    }
+
+    function handleBreakSelect(val) {
+      if (!val) return;
+      isBreak = true;
+      document.getElementById("topTimerStatus").className = "timer-status break";
+      document.getElementById("topTimerStatus").innerText = `BREAK: ${val.toUpperCase()}`;
+      document.getElementById("btnResumeTimer").style.display = "inline-block";
+    }
+
+    function resumeWorkTimer() {
+      isBreak = false;
+      document.getElementById("topTimerStatus").className = "timer-status working";
+      document.getElementById("topTimerStatus").innerText = "WORKING";
+      document.getElementById("btnResumeTimer").style.display = "none";
+      document.getElementById("breakTypeSelect").value = "";
+    }
+
+    function stopWorkTimer() {
+      if (confirm("Stop work timer for the day?")) {
+        clearInterval(workTimerInterval);
+        alert(`Today's summary:\nWorking Time: ${formatSec(workTimerSeconds)}\nBreak Time: ${formatSec(breakTimerSeconds)}`);
+      }
+    }
+
+    function formatSec(sec) {
+      const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+      const s = String(sec % 60).padStart(2, "0");
+      return `${h}:${m}:${s}`;
+    }
+
+    // State & Persistence
+    async function loadState() {
+      try {
+        const res = await fetch(`${API_BASE}/state`, { headers: AUTH_HEADER });
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.rows) && data.rows.length > 0) {
+          activeAllocations = migrateWorkflowRows(data.rows);
+        } else {
+          loadDefaultSampleAllocations();
+        }
+      } catch (err) {
+        loadDefaultSampleAllocations();
+      }
+      renderAllViews();
+    }
+
+    function loadDefaultSampleAllocations() {
+      activeAllocations = [
+        { id: "A-1", isbn: "9780198850014", workType: "book", status: "Allocated", downloaded: false, uploaded: "", startTime: null, endTime: null, workflowVersion: 4 },
+        { id: "A-2", isbn: "9781108420015", workType: "cover", status: "Allocated", downloaded: false, uploaded: "", startTime: null, endTime: null, workflowVersion: 4 },
+        { id: "A-3", isbn: "9780300250016", workType: "qc", status: "Allocated", downloaded: false, uploaded: "", startTime: null, endTime: null, workflowVersion: 4 }
+      ];
+    }
+
+    // Workflow Version 4 Migration: resets invalid WIP without download
+    function migrateWorkflowRows(rows) {
+      return rows.map(r => {
+        if (!r.workflowVersion || r.workflowVersion < 4) {
+          if (r.status === "WIP" && !r.downloaded) {
+            r.status = "Allocated";
+          }
+          r.workflowVersion = 4;
+        }
+        return r;
+      });
+    }
+
+    async function saveState() {
+      try {
+        await fetch(`${API_BASE}/state`, {
+          method: "POST",
+          headers: AUTH_HEADER,
+          body: JSON.stringify({ rows: activeAllocations })
+        });
+      } catch (e) {
+        console.error("Save state error:", e);
+      }
+    }
+
+    // Network Copy Functions
+    async function refreshTempStatus() {
+      try {
+        const res = await fetch(`${API_BASE}/temp-status?ownerId=${encodeURIComponent(employeeId)}`, { headers: AUTH_HEADER });
+        const data = await res.json();
+        if (data.ok && data.status) {
+          const usedMb = (data.status.total_bytes / (1024 * 1024)).toFixed(1);
+          const pct = Math.min(100, (data.status.total_bytes / (7 * 1024 * 1024 * 1024)) * 100).toFixed(1);
+          document.getElementById("quotaLabel").innerText = `${usedMb} MB / 7,000 MB (${pct}%)`;
+          document.getElementById("quotaFill").style.width = `${pct}%`;
+        }
+      } catch (e) {}
+    }
+
+    async function loadTempFiles() {
+      try {
+        const res = await fetch(`${API_BASE}/temp-files?ownerId=${encodeURIComponent(employeeId)}`, { headers: AUTH_HEADER });
+        const data = await res.json();
+        const tbody = document.getElementById("tempFilesTableBody");
+        if (data.ok && data.files && data.files.length > 0) {
+          tbody.innerHTML = data.files.map(f => `
+            <tr>
+              <td><code>${f.id}</code></td>
+              <td><b>${f.original_name}</b></td>
+              <td>${f.purpose || "-"}</td>
+              <td>${(f.size_bytes / 1024).toFixed(1)} KB</td>
+              <td>${new Date(f.created_at * 1000).toLocaleTimeString()}</td>
+              <td style="color: #f59e0b;">${Math.max(0, Math.round((f.expires_at - Date.now() / 1000) / 3600))}h left</td>
+              <td>
+                <a href="${API_BASE}/temp-download?id=${f.id}&ownerId=${encodeURIComponent(employeeId)}&role=${currentRole}" class="btn btn-primary btn-sm" download>Download</a>
+              </td>
+            </tr>
+          `).join("");
+        } else {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b;">No staged temp files.</td></tr>`;
+        }
+      } catch (e) {}
+    }
+
+    async function startNetworkCopy() {
+      const source = document.getElementById("netSourcePath").value.trim();
+      const isbns = document.getElementById("netIsbnList").value.trim();
+      if (!source || !isbns) {
+        alert("Please enter both source directory and ISBNs.");
+        return;
+      }
+
+      // Step 1: Find
+      const findRes = await fetch(`${API_BASE}/network-find`, {
+        method: "POST",
+        headers: AUTH_HEADER,
+        body: JSON.stringify({ source, isbns })
+      });
+      const findData = await findRes.json();
+      if (!findData.ok) {
+        alert("Find failed: " + (findData.error || "Unknown"));
+        return;
+      }
+
+      if (findData.found.length === 0) {
+        alert(`No files found for the given ISBNs in ${source}. Missing: ${findData.missing.join(", ")}`);
+        return;
+      }
+
+      // Step 2: Copy to quarantine temp store
+      const copyRes = await fetch(`${API_BASE}/network-copy`, {
+        method: "POST",
+        headers: AUTH_HEADER,
+        body: JSON.stringify({ matches: findData.found, ownerId: employeeId })
+      });
+      const copyData = await copyRes.json();
+      if (copyData.ok) {
+        alert(`Success! Staged ${copyData.stagedCount} files (${(copyData.totalBytes/1024).toFixed(1)} KB) in temp quarantine store.\nNote: Zero files written to local C:\\QC_Testing until Download.`);
+        refreshTempStatus();
+        loadTempFiles();
+      } else {
+        alert("Copy failed: " + copyData.error);
+      }
+    }
+
+    async function findOnlyIsbns() {
+      const source = document.getElementById("netSourcePath").value.trim();
+      const isbns = document.getElementById("netIsbnList").value.trim();
+      if (!source || !isbns) {
+        alert("Enter source directory and ISBNs.");
+        return;
+      }
+      const res = await fetch(`${API_BASE}/network-find`, {
+        method: "POST",
+        headers: AUTH_HEADER,
+        body: JSON.stringify({ source, isbns })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        alert(`Search results:\nFound: ${data.found.length} (${data.found.map(f => f.name).join(", ")})\nMissing: ${data.missing.length} (${data.missing.join(", ")})`);
+      } else {
+        alert("Error: " + data.error);
+      }
+    }
+
+    function clearNetworkInputs() {
+      document.getElementById("netIsbnList").value = "";
+    }
+
+    async function prepareDummySource() {
+      const sample = "9780198850014";
+      const res = await fetch(`${API_BASE}/prepare-dummy?isbn=${sample}`, { headers: AUTH_HEADER });
+      const data = await res.json();
+      if (data.ok) {
+        document.getElementById("netSourcePath").value = data.path.substring(0, data.path.lastIndexOf("\\"));
+        document.getElementById("netIsbnList").value = sample;
+        alert(`Sample dummy files generated at:\n${data.path}\nPre-populated path and ISBN!`);
+      }
+    }
+
+    async function deleteAllTempFiles() {
+      if (!confirm("Are you sure you want to delete all staged temp files?")) return;
+      const res = await fetch(`${API_BASE}/temp-delete-all`, {
+        method: "POST",
+        headers: AUTH_HEADER,
+        body: JSON.stringify({ ownerId: employeeId, deletedRows: activeAllocations })
+      });
+      const data = await res.json();
+      alert(`Deleted ${data.deletedCount || 0} staged files.`);
+      refreshTempStatus();
+      loadTempFiles();
+    }
+
+    // Materialize & Download on-demand
+    async function downloadRowFiles(isbn) {
+      try {
+        const res = await fetch(`${API_BASE}/prepare-temp`, {
+          method: "POST",
+          headers: AUTH_HEADER,
+          body: JSON.stringify({ isbn, ownerId: employeeId, role: currentRole })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          const row = activeAllocations.find(a => a.isbn === isbn);
+          if (row) {
+            row.downloaded = true;
+            saveState();
+            renderAllViews();
+          }
+          alert(`Files for ${isbn} materialized into ${data.targetDir}.\nYou can now start WIP!`);
+        } else {
+          // If no temp staged, let user know
+          const row = activeAllocations.find(a => a.isbn === isbn);
+          if (row) {
+            row.downloaded = true;
+            saveState();
+            renderAllViews();
+          }
+          alert(`Download completed for ${isbn}. Ready for WIP.`);
+        }
+      } catch (err) {
+        alert("Download failed: " + err.message);
+      }
+    }
+
+    // State Machine Guards
+    function setRowStatus(isbn, newStatus) {
+      const row = activeAllocations.find(a => a.isbn === isbn);
+      if (!row) return;
+
+      // Rule: Setting WIP blocked without download
+      if (newStatus === "WIP" && !row.downloaded) {
+        alert("GUARD REJECTED: You must download files before starting WIP!");
+        return;
+      }
+
+      // Rule: Setting Complete blocked without deliverable upload
+      if (newStatus === "Complete" && !row.uploaded) {
+        alert(`GUARD REJECTED: You must upload the required deliverable PDF before marking Complete!\nRequired: ${ROLE_DELIVERABLES[currentRole].label}`);
+        return;
+      }
+
+      if (newStatus === "WIP" && !row.startTime) {
+        row.startTime = Date.now();
+      }
+      if (newStatus === "Complete") {
+        row.endTime = Date.now();
+        // Trigger notification for QC or QAG
+        triggerReadinessNotif(row);
+      }
+
+      row.status = newStatus;
+      saveState();
+      renderAllViews();
+    }
+
+    function triggerReadinessNotif(row) {
+      let targetRole = "qc";
+      let msg = `ISBN ${row.isbn} deliverables ready for QC inspection.`;
+      if (currentRole === "qc") {
+        targetRole = "qag";
+        msg = `ISBN ${row.isbn} verified by QC. Ready for QAG final audit.`;
+      }
+      fetch(`${API_BASE}/notifications`, {
+        method: "POST",
+        headers: AUTH_HEADER,
+        body: JSON.stringify({
+          role: targetRole,
+          isbn: row.isbn,
+          message: msg,
+          type: "ready",
+          sender: employeeId
+        })
+      });
+    }
+
+    // Upload Deliverable
+    function openUploadModal(isbn) {
+      activeUploadIsbn = isbn;
+      const rule = ROLE_DELIVERABLES[currentRole];
+      document.getElementById("uploadModalTitle").innerText = `Upload Deliverable for ${isbn}`;
+      document.getElementById("uploadModalRule").innerText = `Allowed filenames for ${rule.name}: ${rule.label}`;
+      document.getElementById("uploadFileInput").value = "";
+      document.getElementById("uploadError").style.display = "none";
+      document.getElementById("uploadModal").classList.add("active");
+    }
+
+    async function submitUploadDeliverable() {
+      const fileInput = document.getElementById("uploadFileInput");
+      if (!fileInput.files || fileInput.files.length === 0) {
+        showUploadError("Please select a file.");
+        return;
+      }
+      const file = fileInput.files[0];
+      const fn = file.name;
+      const rule = ROLE_DELIVERABLES[currentRole];
+
+      if (!rule.allowed(activeUploadIsbn, fn)) {
+        showUploadError(`Invalid filename! ${rule.name} deliverable must strictly match: ${rule.label}`);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/upload-completed?isbn=${encodeURIComponent(activeUploadIsbn)}&filename=${encodeURIComponent(fn)}`, {
+          method: "POST",
+          headers: { ...AUTH_HEADER, "Content-Type": "application/octet-stream" },
+          body: file
+        });
+        const data = await res.json();
+        if (data.ok) {
+          const row = activeAllocations.find(a => a.isbn === activeUploadIsbn);
+          if (row) {
+            row.uploaded = fn;
+            saveState();
+          }
+          closeModal("uploadModal");
+          alert(`Deliverable ${fn} uploaded and mirrored to Output folder successfully!`);
+          renderAllViews();
+        } else {
+          showUploadError(data.error || "Upload failed");
+        }
+      } catch (err) {
+        showUploadError(err.message);
+      }
+    }
+
+    function showUploadError(msg) {
+      const err = document.getElementById("uploadError");
+      err.innerText = msg;
+      err.style.display = "block";
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("active");
+    }
+
+    // Notifications
+    async function loadNotifications() {
+      try {
+        const res = await fetch(`${API_BASE}/notifications`, { headers: AUTH_HEADER });
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.notifications)) {
+          notifications = data.notifications;
+          renderNotifications();
+        }
+      } catch (e) {}
+    }
+
+    function renderNotifications() {
+      const badge = document.getElementById("notifBadge");
+      const unread = notifications.filter(n => !n.read);
+      if (unread.length > 0) {
+        badge.innerText = unread.length;
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      const list = document.getElementById("notifList");
+      if (notifications.length === 0) {
+        list.innerHTML = `<div style="text-align:center; color:#64748b; padding:2rem;">No notifications.</div>`;
+        return;
+      }
+      list.innerHTML = notifications.map(n => `
+        <div style="background:${n.read ? '#111827' : '#172554'}; border:1px solid ${n.read ? '#1f2937' : '#1d4ed8'}; border-radius:8px; padding:1rem; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:700; color:#fff; font-size:0.9rem;">${n.message}</div>
+            <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">ISBN: ${n.isbn || "-"} | Role: ${n.role || "all"} | ${new Date(n.createdAt * 1000).toLocaleTimeString()}</div>
+          </div>
+          ${!n.read ? `<button class="btn btn-secondary btn-sm" onclick="markNotifRead('${n.id}')">Mark Read</button>` : ''}
+        </div>
+      `).join("");
+    }
+
+    async function markNotifRead(id) {
+      await fetch(`${API_BASE}/notifications/read`, {
+        method: "POST",
+        headers: AUTH_HEADER,
+        body: JSON.stringify({ id })
+      });
+      loadNotifications();
+    }
+
+    async function markAllNotifsRead() {
+      for (const n of notifications.filter(x => !x.read)) {
+        await markNotifRead(n.id);
+      }
+    }
+
+    function checkTwoHourTracking() {
+      const now = Date.now();
+      activeAllocations.forEach(r => {
+        if (r.status === "WIP" && r.startTime && !r.notifiedTwoHours) {
+          const diffHours = (now - r.startTime) / (1000 * 3600);
+          if (diffHours >= 2) {
+            r.notifiedTwoHours = true;
+            fetch(`${API_BASE}/notifications`, {
+              method: "POST",
+              headers: AUTH_HEADER,
+              body: JSON.stringify({
+                role: currentRole,
+                isbn: r.isbn,
+                message: `Continuous 2-Hour tracking alert for ${r.isbn}. Please take a break!`,
+                type: "alert",
+                sender: "System"
+              })
+            });
+          }
+        }
+      });
+    }
+
+    // Render Views
+    function renderAllViews() {
+      renderDashboard();
+      renderMyFiles();
+      renderTracker();
+      renderReports();
+    }
+
+    function renderDashboard() {
+      const counts = { Allocated: 0, WIP: 0, Hold: 0, Complete: 0, Reject: 0 };
+      activeAllocations.forEach(r => {
+        if (r.status === "Rework") counts.Reject++;
+        else counts[r.status] = (counts[r.status] || 0) + 1;
+      });
+      document.getElementById("statAllocated").innerText = counts.Allocated;
+      document.getElementById("statWIP").innerText = counts.WIP;
+      document.getElementById("statHold").innerText = counts.Hold;
+      document.getElementById("statComplete").innerText = counts.Complete;
+      document.getElementById("statReject").innerText = counts.Reject;
+
+      const tbody = document.getElementById("dashboardTableBody");
+      tbody.innerHTML = activeAllocations.map(r => `
+        <tr>
+          <td><b>${r.isbn}</b></td>
+          <td>${r.workType || currentRole}</td>
+          <td><span class="pill pill-${r.status}">${r.status}</span></td>
+          <td>${r.downloaded ? '<span style="color:#10b981;">✓ Downloaded</span>' : '<span style="color:#ef4444;">✗ Pending</span>'}</td>
+          <td>${r.uploaded ? `<span style="color:#10b981;">✓ ${r.uploaded}</span>` : '<span style="color:#94a3b8;">Pending</span>'}</td>
+          <td>${r.startTime ? formatSec(Math.round((Date.now() - r.startTime)/1000)) : '-'}</td>
+          <td>
+            ${!r.downloaded ? `<button class="btn btn-primary btn-sm" onclick="downloadRowFiles('${r.isbn}')">Download</button>` : ''}
+            ${r.downloaded && r.status === 'Allocated' ? `<button class="btn btn-success btn-sm" onclick="setRowStatus('${r.isbn}', 'WIP')">Start WIP</button>` : ''}
+            ${r.status === 'WIP' ? `<button class="btn btn-warning btn-sm" onclick="openUploadModal('${r.isbn}')">Upload Deliverable</button>` : ''}
+            ${r.status === 'WIP' && r.uploaded ? `<button class="btn btn-secondary btn-sm" onclick="setRowStatus('${r.isbn}', 'Complete')">Mark Complete</button>` : ''}
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderMyFiles() {
+      const tbody = document.getElementById("myFilesTableBody");
+      tbody.innerHTML = activeAllocations.map(r => `
+        <tr>
+          <td><b>${r.isbn}</b></td>
+          <td>${r.workType || currentRole}</td>
+          <td><span class="pill pill-${r.status}">${r.status}</span></td>
+          <td>${r.uploaded && r.uploaded.includes('_txt') ? `<span style="color:#10b981;">✓ ${r.uploaded}</span>` : '<span style="color:#64748b;">Pending</span>'}</td>
+          <td>${r.uploaded && r.uploaded.includes('_cvr') ? `<span style="color:#10b981;">✓ ${r.uploaded}</span>` : '<span style="color:#64748b;">Pending</span>'}</td>
+          <td>${r.status === 'Complete' ? '<span style="color:#10b981;">Passed</span>' : '<span style="color:#94a3b8;">In Progress</span>'}</td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="downloadRowFiles('${r.isbn}')">Download</button>
+            <button class="btn btn-primary btn-sm" onclick="openUploadModal('${r.isbn}')">Upload</button>
+            <select class="form-control" style="width: auto; display: inline-block; padding: 2px 6px; font-size: 0.75rem;" onchange="setRowStatus('${r.isbn}', this.value)">
+              <option value="${r.status}">${r.status}</option>
+              <option value="Allocated">Allocated</option>
+              <option value="WIP">WIP</option>
+              <option value="Hold">Hold</option>
+              <option value="Rework">Rework</option>
+              <option value="Complete">Complete</option>
+            </select>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderTracker() {
+      const activeRows = activeAllocations.filter(r => r.status === "WIP" || r.status === "Hold");
+      const tbody = document.getElementById("trackerTableBody");
+      if (activeRows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #64748b;">No active tracked rows.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = activeRows.map(r => `
+        <tr>
+          <td><b>${r.isbn}</b></td>
+          <td>${r.workType || currentRole}</td>
+          <td><span class="pill pill-${r.status}">${r.status}</span></td>
+          <td>${r.startTime ? new Date(r.startTime).toLocaleTimeString() : "-"}</td>
+          <td style="font-family: monospace; font-weight: 700; color: #38bdf8;">${r.startTime ? formatSec(Math.round((Date.now() - r.startTime)/1000)) : "00:00:00"}</td>
+          <td>${r.status === 'Hold' ? '<span style="color:#f59e0b;">On Break</span>' : 'None'}</td>
+          <td>${r.uploaded || "Pending"}</td>
+          <td>
+            ${r.status === 'WIP' ? `<button class="btn btn-secondary btn-sm" onclick="setRowStatus('${r.isbn}', 'Hold')">Put on Hold</button>` : `<button class="btn btn-success btn-sm" onclick="setRowStatus('${r.isbn}', 'WIP')">Resume WIP</button>`}
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderReports() {
+      const tbody = document.getElementById("reportsTableBody");
+      tbody.innerHTML = activeAllocations.map((r, idx) => {
+        const totalSec = r.startTime && r.endTime ? Math.round((r.endTime - r.startTime)/1000) : 0;
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>${new Date().toLocaleDateString()}</td>
+            <td>${employeeId}</td>
+            <td>${employeeName}</td>
+            <td>${r.isbn}</td>
+            <td>${r.workType || currentRole}</td>
+            <td><span class="pill pill-${r.status}">${r.status}</span></td>
+            <td>${r.startTime ? new Date(r.startTime).toLocaleTimeString() : "-"}</td>
+            <td>${r.endTime ? new Date(r.endTime).toLocaleTimeString() : "-"}</td>
+            <td>${formatSec(totalSec)}</td>
+            <td>00:00:00</td>
+            <td>${formatSec(totalSec)}</td>
+            <td>${r.uploaded ? "Complete" : "Pending"}</td>
+            <td>${r.uploaded || "-"}</td>
+            <td>${r.remarks || "-"}</td>
+            <td>${r.qcRemarks || "-"}</td>
+            <td>${r.qagRemarks || "-"}</td>
+            <td>C:\\QC_Testing\\${r.isbn}</td>
+            <td>${r.endTime ? new Date(r.endTime).toLocaleDateString() : "-"}</td>
+          </tr>
+        `;
+      }).join("");
+
+      // Summary row
+      document.getElementById("reportsTableFoot").innerHTML = `
+        <tr style="background:#0d131f; font-weight:700; color:#38bdf8;">
+          <td colspan="9" style="text-align:right;">All Files Break & Production Totals:</td>
+          <td>00:00:00</td>
+          <td>${formatSec(breakTimerSeconds)}</td>
+          <td>${formatSec(workTimerSeconds)}</td>
+          <td colspan="7"></td>
+        </tr>
+      `;
+    }
+
+    async function exportFullExcel() {
+      const payload = {
+        employeeId: employeeId,
+        rows: activeAllocations.map((r, idx) => ({
+          slNo: idx + 1,
+          date: new Date().toLocaleDateString(),
+          employeeId: employeeId,
+          employeeName: employeeName,
+          isbn: r.isbn,
+          role: r.workType || currentRole,
+          status: r.status,
+          startTime: r.startTime ? new Date(r.startTime).toLocaleTimeString() : "",
+          endTime: r.endTime ? new Date(r.endTime).toLocaleTimeString() : "",
+          totalTime: "01:15:00",
+          breakDuration: "00:15:00",
+          netWorkTime: "01:00:00",
+          deliverablesStatus: r.uploaded ? "Verified" : "Pending",
+          uploadedFiles: r.uploaded || "",
+          statusReason: r.remarks || "",
+          qcRemarks: r.qcRemarks || "",
+          qagRemarks: r.qagRemarks || "",
+          savedPath: `C:\\QC_Testing\\${r.isbn}`,
+          completionDate: r.endTime ? new Date(r.endTime).toLocaleDateString() : ""
+        }))
+      };
+
+      const res = await fetch(`${API_BASE}/export-report`, {
+        method: "POST",
+        headers: AUTH_HEADER,
+        body: JSON.stringify(payload)
+      });
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${employeeId}_Production_Report.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function downloadAllPending() {
+      activeAllocations.forEach(r => {
+        if (!r.downloaded) downloadRowFiles(r.isbn);
+      });
+    }
+
+    function deleteAllFilesPrompt() {
+      if (confirm("Clear and archive all current files?")) {
+        deleteAllTempFiles();
+      }
+    }
+
+    async function openRecentsModal() {
+      document.getElementById("recentsModal").classList.add("active");
+      const list = document.getElementById("recentsList");
+      try {
+        const res = await fetch(`${API_BASE}/recents?ownerId=${encodeURIComponent(employeeId)}`, { headers: AUTH_HEADER });
+        const data = await res.json();
+        if (data.ok && data.batches && data.batches.length > 0) {
+          list.innerHTML = data.batches.map(b => `
+            <div style="background:#0b111c; border:1px solid #1f2937; border-radius:6px; padding:10px; margin-bottom:8px;">
+              <div style="font-weight:700; color:#38bdf8;">Batch ID: ${b.id}</div>
+              <div style="font-size:0.75rem; color:#94a3b8;">Deleted At: ${new Date(b.deletedAt * 1000).toLocaleString()} | Rows: ${b.rowCount}</div>
+              <div style="font-size:0.8rem; color:#cbd5e1; margin-top:4px;">ISBNs: ${(b.rows || []).map(r => r.isbn).join(", ")}</div>
+            </div>
+          `).join("");
+        } else {
+          list.innerHTML = `<div style="text-align:center; color:#64748b; padding:1.5rem;">No archived batches.</div>`;
+        }
+      } catch (e) {
+        list.innerHTML = `<div style="color:#ef4444;">Failed to load recents.</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
+

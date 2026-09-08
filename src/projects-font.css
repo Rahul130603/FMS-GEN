@@ -1,0 +1,14 @@
+/* Projects section typography upgraded for clear visibility and readability. */
+.project-information button,
+.query-workspace button,
+.workflow-tabs button,
+.query-toolbar button,
+.chapter-link{font-size:12px}
+
+.project-information small,
+.query-workspace small,
+.workflow-tabs small,
+.query-dept small,
+.query-due small{font-size:11px}
+
+.project-wide-detail p span{font-size:12px}

@@ -1,0 +1,5 @@
+@tailwind utilities;
+
+.original-report {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}

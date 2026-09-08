@@ -1,0 +1,56 @@
+.imail-modern-head>button,
+.imail-modern .folder-compose,
+.imail-modern .imail-center>footer b,
+.imail-modern .imail-compose footer .send,
+.imail-modern .imail-view footer .send {
+  background: #2874b2;
+  border-color: #2874b2;
+}
+
+.imail-modern .imail-kpis i {
+  background: #e8f2fb;
+  color: #2874b2;
+}
+
+.imail-modern .imail-folders>button.active {
+  background: #e8f2fb;
+  color: #1f669f;
+}
+
+.imail-modern .imail-folders>button b {
+  color: #2874b2;
+}
+
+.imail-modern-list article.unread {
+  background: #f1f7fc;
+}
+
+.imail-modern-list article.selected-mail {
+  background: #e8f2fb;
+  box-shadow: inset 3px 0 #2874b2;
+}
+
+.imail-modern .sender-avatar {
+  background: #dcecf9;
+  color: #1f669f;
+}
+
+.imail-modern .quick-actions .resolve {
+  background: #e8f2fb;
+  color: #1f669f;
+  border-color: #b9d5eb;
+}
+
+.imail-modern .conversation i {
+  background: #2874b2;
+}
+
+.imail-modern .type-tag {
+  background: #e8f2fb;
+  border-color: #8db9dc;
+  color: #1f669f;
+}
+
+.imail-modern .detail-attachments svg {
+  color: #2874b2;
+}
